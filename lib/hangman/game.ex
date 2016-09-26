@@ -107,7 +107,7 @@ Here's this module being exercised from an iex session:
 
     iex(13)> { game, state, guess } = G.make_move(game, "b")
     . . .
-    iex(14)> state                                          
+    iex(14)> state
     :bad_guess
 
     iex(15)> { game, state, guess } = G.make_move(game, "f")
@@ -131,6 +131,9 @@ Here's this module being exercised from an iex session:
 
   """
 
+
+
+
   @type state :: map
   @type ch    :: binary
   @type optional_ch :: ch | nil
@@ -142,6 +145,8 @@ Here's this module being exercised from an iex session:
 
   @spec new_game :: state
   def new_game do
+    new_game(Hangman.Dictionary.random_word)
+    # IO.inspect Hangman.Dictionary.random_word
   end
 
 
@@ -152,6 +157,12 @@ Here's this module being exercised from an iex session:
   """
   @spec new_game(binary) :: state
   def new_game(word) do
+    %{
+      word: word,                  #word passed in
+      unique_letters: generate_unique_letters_list(word),        #list unique letters
+      letters_used_so_far: [],   #all letters guessed so far
+      guess_count: 0             #number of quesses
+    }
   end
 
 
@@ -177,6 +188,16 @@ Here's this module being exercised from an iex session:
 
   @spec make_move(state, ch) :: { state, atom, optional_ch }
   def make_move(state, guess) do
+
+    state = %{state |
+      letters_used_so_far: List.insert_at(state.letters_used_so_far, 0, guess),
+      guess_count: state.guess_count + 1
+    }
+
+    #
+    # cond do
+    #   state.
+    # end
   end
 
 
@@ -187,6 +208,7 @@ Here's this module being exercised from an iex session:
   """
   @spec word_length(state) :: integer
   def word_length(%{ word: word }) do
+    String.length word
   end
 
   @doc """
@@ -199,6 +221,7 @@ Here's this module being exercised from an iex session:
 
   @spec letters_used_so_far(state) :: [ binary ]
   def letters_used_so_far(state) do
+    state.letters_used_so_far
   end
 
   @doc """
@@ -211,6 +234,7 @@ Here's this module being exercised from an iex session:
 
   @spec turns_left(state) :: integer
   def turns_left(state) do
+    10 - state.guess_count
   end
 
   @doc """
@@ -231,5 +255,10 @@ Here's this module being exercised from an iex session:
   ###########################
 
   # Your private functions go here
+  defp generate_unique_letters_list(word) do
+    String.codepoints(word)
+    |> Enum.uniq
+  end
+
 
  end
